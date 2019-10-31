@@ -1,0 +1,62 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>WASM Stuff</title>
+
+    <style>
+        canvas {
+            border: 1px solid black;
+            width: 360px;
+            height: 600px;
+        }
+
+        #debug {
+            float: left;
+            width: 1200px
+        }
+
+        footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: red;
+            color: white;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <img id="redsquare" src="red.png" style="display: none;" />
+    <img id="greensquare" src="Green.png" style="display: none;" />
+    <img id="bluesquare" src="blue.png" style="display: none;" />
+    <img id="purplesquare" src="purple.png" style="display: none;" />
+    <button id="reset">New Game</button>
+    <span id="state"></span>
+    <div>
+        <div style="float:left">
+            <canvas id="canv" width="360" height="600"></canvas>
+        </div>
+        <div id="dbg">
+        </div>
+
+    </div>
+
+    <footer>
+        Game: <span id="gs"></span>
+    </footer>
+    <script src="wasm_exec.js"></script>
+    <script>
+        const go = new Go();
+        let mod, inst;
+        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then(async (result) => {
+            mod = result.module;
+            inst = result.instance;
+            await go.run(inst)
+        });
+    </script>
+</body>
+
+</html>
