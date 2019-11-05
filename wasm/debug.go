@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/pezza/wasm/game"
+	"github.com/pezza/flaten/game"
 )
 
 func debugTable() {
@@ -22,5 +22,5 @@ func debugTable() {
 		}
 		html = fmt.Sprintf("%v<tr>%v</tr>", html, line)
 	}
-	setElementInnerHTML("dbg", fmt.Sprintf(`<table>%v</table>`, html))
+	page.setElementInnerHTML("dbg", fmt.Sprintf(`<table>%v</table>`, html))
 }

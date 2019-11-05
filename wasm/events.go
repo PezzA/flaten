@@ -9,13 +9,13 @@ var mousePos [2]float64
 
 func initEvents() {
 	mouseMoveEvt = js.FuncOf(mouseMove)
-	doc.Call("addEventListener", "mousemove", mouseMoveEvt)
+	page.doc.Call("addEventListener", "mousemove", mouseMoveEvt)
 
 	resetClickEvt = js.FuncOf(resetClick)
-	doc.Call("getElementById", "reset").Call("addEventListener", "click", resetClickEvt)
+	page.doc.Call("getElementById", "reset").Call("addEventListener", "click", resetClickEvt)
 
 	canvasClickEvt = js.FuncOf(canvasClick)
-	canvas.Call("addEventListener", "click", canvasClickEvt)
+	page.canvas.Call("addEventListener", "click", canvasClickEvt)
 
 	renderFrameEvt = js.FuncOf(renderFrame)
 }
@@ -32,7 +32,7 @@ func canvasClick(this js.Value, args []js.Value) interface{} {
 	return nil
 }
 func renderFrame(this js.Value, args []js.Value) interface{} {
-	ctx.Call("clearRect", 0, 0, displayWidth, displayHeight)
+	page.ctx.Call("clearRect", 0, 0, displayWidth, displayHeight)
 	updateGame(args[0].Float())
 	drawGameGrid()
 
@@ -48,8 +48,8 @@ func resetClick(this js.Value, args []js.Value) interface{} {
 func mouseMove(this js.Value, args []js.Value) interface{} {
 	e := args[0]
 
-	mousePos[0] = e.Get("clientX").Float() - canvas.Get("offsetLeft").Float()
-	mousePos[1] = e.Get("clientY").Float() - canvas.Get("offsetTop").Float()
+	mousePos[0] = e.Get("clientX").Float() - page.canvas.Get("offsetLeft").Float()
+	mousePos[1] = e.Get("clientY").Float() - page.canvas.Get("offsetTop").Float()
 
 	if mousePos[0] < 0 {
 		mousePos[0] = 0
