@@ -238,20 +238,14 @@ func (g *Game) Update(now float64) {
 	if g.State == Running {
 		delta := now - g.Timer
 		g.Timer = now
-		g.updateBlock(delta)
+		g.updateBlocks(delta)
 	}
 }
 
-func (g *Game) updateBlock(delta float64) {
+func (g *Game) updateBlocks(delta float64) {
 	for x := 0; x < g.Width; x++ {
 		for y := 0; y < g.Height; y++ {
-			if g.blocks[y][x].Moving {
-				g.blocks[y][x].Drop += delta * 10
-				if g.blocks[y][x].Drop > float64(g.blocks[y][x].Dist*1000) {
-					g.blocks[y][x].Moving = false
-					g.blocks[y][x].Drop = 0
-				}
-			}
+			g.blocks[y][x].update(delta)
 		}
 	}
 }

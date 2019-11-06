@@ -63,3 +63,13 @@ func (b Block) GetMovingCode() string {
 func (b Block) String() string {
 	return fmt.Sprintf("[%v,%v]%v%v", b.X, b.Y, b.GetTypeCode(), b.GetMovingCode())
 }
+
+func (b *Block) update(delta float64) {
+	if b.Moving {
+		b.Drop += delta * 10
+		if b.Drop > float64(b.Dist*1000) {
+			b.Moving = false
+			b.Drop = 0
+		}
+	}
+}
