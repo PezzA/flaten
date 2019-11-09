@@ -53,14 +53,14 @@ func NewGame(width int, height int) Game {
 				maxFrame = 8
 			}
 
-			currentframe := rand.Intn(maxFrame)
+			//currentframe := rand.Intn(maxFrame)
 			g.blocks[y][x] = Block{
 				Point:        Point{X: x, Y: y},
 				Type:         bt,
 				Moving:       false,
 				Drop:         0,
 				MaxFrame:     maxFrame,
-				CurrentFrame: currentframe,
+				CurrentFrame: 0,
 				FrameTimer:   0,
 			}
 		}
@@ -86,7 +86,7 @@ func (g *Game) ClickGrid(x int, y int) {
 
 	blockGroup := g.getBlockGroup(g.blocks[y][x].Type, []Point{Point{X: x, Y: y}})
 
-	if len(blockGroup) == 1 {
+	if len(blockGroup) < 3 {
 		return
 	}
 
@@ -103,8 +103,6 @@ func (g *Game) ClickGrid(x int, y int) {
 	// squash empty cols
 	g.shiftLeft()
 	g.shiftRight()
-
-	// count moves
 }
 
 func (g *Game) gameOver() bool {
@@ -117,7 +115,7 @@ func (g *Game) gameOver() bool {
 				return false
 			}
 			blockGroup := g.getBlockGroup(g.blocks[y][x].Type, []Point{Point{X: x, Y: y}})
-			if len(blockGroup) > 1 {
+			if len(blockGroup) > 2 {
 				return false
 			}
 		}
@@ -181,7 +179,8 @@ func (g *Game) shuntCol(x int) {
 			if shunt > 0 {
 				g.blocks[i+shunt][x].Type = g.blocks[i][x].Type
 				g.blocks[i+shunt][x].Moving = true
-				g.blocks[i+shunt][x].Dist = float64(shunt)
+				g.blocks[i+shunt][x].Dist = shunt
+				g.blocks[i+shunt][x].TotalDrop = float64(shunt) * dropTime
 				g.blocks[i][x].Type = Temp
 			}
 		}
