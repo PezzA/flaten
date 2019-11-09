@@ -40,15 +40,28 @@ func NewGame(width int, height int) Game {
 		g.blocks[index] = make([]Block, width)
 	}
 
-	min, max := playTileMin, playTileMax
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			bt := rand.Intn(max-min+1) + min
+			bt := rand.Intn(playTileMax-playTileMin+1) + playTileMin
+
+			maxFrame := 0
+			if bt == Red || bt == Green {
+				maxFrame = 4
+			}
+
+			if bt == Blue || bt == Purple {
+				maxFrame = 8
+			}
+
+			currentframe := rand.Intn(maxFrame)
 			g.blocks[y][x] = Block{
-				Point:  Point{X: x, Y: y},
-				Type:   bt,
-				Moving: false,
-				Drop:   0,
+				Point:        Point{X: x, Y: y},
+				Type:         bt,
+				Moving:       false,
+				Drop:         0,
+				MaxFrame:     maxFrame,
+				CurrentFrame: currentframe,
+				FrameTimer:   0,
 			}
 		}
 	}

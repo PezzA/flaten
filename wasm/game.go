@@ -9,7 +9,7 @@ import (
 var g game.Game
 
 var gameWidth, gameHeight, displayWidth, displayHeight = 12, 20, 360, 600
-var gridSize = 30
+var gridSize = 16
 var gridXOffSet = (displayWidth - (gameWidth * gridSize)) / 2
 
 func updateGame(now float64) {
@@ -40,22 +40,22 @@ func drawGameGrid() {
 			} else {
 				if bl.Type == game.Empty || bl.Moving {
 					page.ctx.Set("globalAlpha", 0.8)
-					offset := bl.Dist * 30
+					offset := bl.Dist * float64(gridSize)
 
-					drawY -= int(offset - bl.Drop/float64(33))
+					drawY -= int(offset - bl.Drop/float64(16))
 				} else {
 					page.ctx.Set("globalAlpha", 1)
 				}
 			}
 
 			if bl.Type == game.Red {
-				page.ctx.Call("drawImage", red, drawX, drawY)
+				page.ctx.Call("drawImage", redSprite, bl.CurrentFrame*16, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
 			} else if bl.Type == game.Blue {
-				page.ctx.Call("drawImage", blue, drawX, drawY)
+				page.ctx.Call("drawImage", blueSprite, bl.CurrentFrame*16, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
 			} else if bl.Type == game.Green {
-				page.ctx.Call("drawImage", green, drawX, drawY)
-			} else if bl.Type == game.White {
-				page.ctx.Call("drawImage", purple, drawX, drawY)
+				page.ctx.Call("drawImage", greenSprite, bl.CurrentFrame*16, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
+			} else if bl.Type == game.Purple {
+				page.ctx.Call("drawImage", purpleSprite, bl.CurrentFrame*16, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
 			}
 		}
 	}
