@@ -5,15 +5,6 @@
     <title>WASM Stuff</title>
 
     <style>
-        canvas {
-            border: 1px solid black;       
-        }
-
-        #debug {
-            float: left;
-            width: 1200px
-        }
-
         footer {
             position: fixed;
             left: 0;
@@ -31,13 +22,19 @@
     <img id="greensprite" src="assets/gems/items_greengem.png" style="display: none;" />
     <img id="bluesprite" src="assets/gems/items_bluegem.png" style="display: none;" />
     <img id="purplesprite" src="assets/gems/items_heart.png" style="display: none;" />
+    <audio id="music" loop>
+        <source src="assets/music/music.ogg" type="audio/ogg">
+        <source src="assets/music/music.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="click">
+        <source src="assets/sfx/click.wav" type="audio/wav">
+
+    </audio>
     <button id="reset">New Game</button>
-    <span id="state"></span>
+    <button id="muteToggle">Mute</button>
     <div>
         <div style="float:left">
             <canvas id="canv" width="360" height="600"></canvas>
-        </div>
-        <div id="dbg">
         </div>
     </div>
     <footer>

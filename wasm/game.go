@@ -20,8 +20,8 @@ func updateGame(now float64) {
 	page.setElementInnerHTML("gs", fmt.Sprintf("%v", g.State))
 }
 
-func handleClick(x int, y int) {
-	g.ClickGrid(x/gridSize, y/gridSize)
+func handleClick(x int, y int) bool {
+	return g.ClickGrid(x/gridSize, y/gridSize)
 }
 
 func initGame() {

@@ -75,19 +75,19 @@ func (g *Game) GetBlock(x int, y int) Block {
 }
 
 // ClickGrid handle a click on a cell
-func (g *Game) ClickGrid(x int, y int) {
+func (g *Game) ClickGrid(x int, y int) bool {
 	if g.State != Running || x >= g.Width || y >= g.Height || x < 0 || y < 0 {
-		return
+		return false
 	}
 
 	if g.blocks[y][x].Type == Empty {
-		return
+		return false
 	}
 
 	blockGroup := g.getBlockGroup(g.blocks[y][x].Type, []Point{Point{X: x, Y: y}})
 
 	if len(blockGroup) < 3 {
-		return
+		return false
 	}
 
 	colList := make(map[int]bool, 0)
@@ -103,6 +103,8 @@ func (g *Game) ClickGrid(x int, y int) {
 	// squash empty cols
 	g.shiftLeft()
 	g.shiftRight()
+
+	return true
 }
 
 func (g *Game) gameOver() bool {

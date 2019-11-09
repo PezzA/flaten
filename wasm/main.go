@@ -29,7 +29,6 @@ func init() {
 
 	initEvents()
 	initAssets()
-	initGame()
 }
 
 func main() {
