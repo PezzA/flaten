@@ -4,8 +4,10 @@ import (
 	"syscall/js"
 )
 
-var mouseMoveEvt, resetClickEvt, renderFrameEvt, canvasClickEvt js.Func
+var mouseMoveEvt, resetClickEvt, renderFrameEvt, canvasClickEvt, muteToggleEvt js.Func
 var mousePos [2]float64
+
+var musicVol = 1
 
 func initEvents() {
 	mouseMoveEvt = js.FuncOf(mouseMove)
@@ -13,6 +15,9 @@ func initEvents() {
 
 	resetClickEvt = js.FuncOf(resetClick)
 	page.doc.Call("getElementById", "reset").Call("addEventListener", "click", resetClickEvt)
+
+	muteToggleEvt = js.FuncOf(muteToggleClick)
+	page.doc.Call("getElementById", "muteToggle").Call("addEventListener", "click", muteToggleEvt)
 
 	canvasClickEvt = js.FuncOf(canvasClick)
 	page.canvas.Call("addEventListener", "click", canvasClickEvt)
@@ -28,7 +33,10 @@ func releaseEvents() {
 }
 
 func canvasClick(this js.Value, args []js.Value) interface{} {
-	handleClick(int(mousePos[0]), int(mousePos[1]))
+	if handleClick(int(mousePos[0]), int(mousePos[1])) {
+		click.Set("currentTime", 0)
+		click.Call("play")
+	}
 	return nil
 }
 func renderFrame(this js.Value, args []js.Value) interface{} {
@@ -40,8 +48,20 @@ func renderFrame(this js.Value, args []js.Value) interface{} {
 	return nil
 }
 
+func muteToggleClick(this js.Value, args []js.Value) interface{} {
+	if musicVol == 0 {
+		musicVol = 1
+	} else {
+		musicVol = 0
+	}
+	music.Set("volume", musicVol)
+	return nil
+}
+
 func resetClick(this js.Value, args []js.Value) interface{} {
 	initGame()
+	music.Set("currentTime", 0)
+	music.Call("play")
 	return nil
 }
 

@@ -40,15 +40,28 @@ func NewGame(width int, height int) Game {
 		g.blocks[index] = make([]Block, width)
 	}
 
-	min, max := playTileMin, playTileMax
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			bt := rand.Intn(max-min+1) + min
+			bt := rand.Intn(playTileMax-playTileMin+1) + playTileMin
+
+			maxFrame := 0
+			if bt == Red || bt == Green {
+				maxFrame = 4
+			}
+
+			if bt == Blue || bt == Purple {
+				maxFrame = 8
+			}
+
+			//currentframe := rand.Intn(maxFrame)
 			g.blocks[y][x] = Block{
-				Point:  Point{X: x, Y: y},
-				Type:   bt,
-				Moving: false,
-				Drop:   0,
+				Point:        Point{X: x, Y: y},
+				Type:         bt,
+				Moving:       false,
+				Drop:         0,
+				MaxFrame:     maxFrame,
+				CurrentFrame: 0,
+				FrameTimer:   0,
 			}
 		}
 	}
@@ -62,19 +75,19 @@ func (g *Game) GetBlock(x int, y int) Block {
 }
 
 // ClickGrid handle a click on a cell
-func (g *Game) ClickGrid(x int, y int) {
+func (g *Game) ClickGrid(x int, y int) bool {
 	if g.State != Running || x >= g.Width || y >= g.Height || x < 0 || y < 0 {
-		return
+		return false
 	}
 
 	if g.blocks[y][x].Type == Empty {
-		return
+		return false
 	}
 
 	blockGroup := g.getBlockGroup(g.blocks[y][x].Type, []Point{Point{X: x, Y: y}})
 
-	if len(blockGroup) == 1 {
-		return
+	if len(blockGroup) < 3 {
+		return false
 	}
 
 	colList := make(map[int]bool, 0)
@@ -91,7 +104,7 @@ func (g *Game) ClickGrid(x int, y int) {
 	g.shiftLeft()
 	g.shiftRight()
 
-	// count moves
+	return true
 }
 
 func (g *Game) gameOver() bool {
@@ -104,7 +117,7 @@ func (g *Game) gameOver() bool {
 				return false
 			}
 			blockGroup := g.getBlockGroup(g.blocks[y][x].Type, []Point{Point{X: x, Y: y}})
-			if len(blockGroup) > 1 {
+			if len(blockGroup) > 2 {
 				return false
 			}
 		}
@@ -168,7 +181,8 @@ func (g *Game) shuntCol(x int) {
 			if shunt > 0 {
 				g.blocks[i+shunt][x].Type = g.blocks[i][x].Type
 				g.blocks[i+shunt][x].Moving = true
-				g.blocks[i+shunt][x].Dist = float64(shunt)
+				g.blocks[i+shunt][x].Dist = shunt
+				g.blocks[i+shunt][x].TotalDrop = float64(shunt) * dropTime
 				g.blocks[i][x].Type = Temp
 			}
 		}

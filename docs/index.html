@@ -5,17 +5,6 @@
     <title>WASM Stuff</title>
 
     <style>
-        canvas {
-            border: 1px solid black;
-            width: 360px;
-            height: 600px;
-        }
-
-        #debug {
-            float: left;
-            width: 1200px
-        }
-
         footer {
             position: fixed;
             left: 0;
@@ -29,21 +18,25 @@
 </head>
 
 <body>
-    <img id="redsquare" src="red.png" style="display: none;" />
-    <img id="greensquare" src="green.png" style="display: none;" />
-    <img id="bluesquare" src="blue.png" style="display: none;" />
-    <img id="purplesquare" src="purple.png" style="display: none;" />
+    <img id="redsprite" src="assets/gems/items_redgem.png" style="display: none;" />
+    <img id="greensprite" src="assets/gems/items_greengem.png" style="display: none;" />
+    <img id="bluesprite" src="assets/gems/items_bluegem.png" style="display: none;" />
+    <img id="purplesprite" src="assets/gems/items_heart.png" style="display: none;" />
+    <audio id="music" loop>
+        <source src="assets/music/music.ogg" type="audio/ogg">
+        <source src="assets/music/music.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="click">
+        <source src="assets/sfx/click.wav" type="audio/wav">
+
+    </audio>
     <button id="reset">New Game</button>
-    <span id="state"></span>
+    <button id="muteToggle">Mute</button>
     <div>
         <div style="float:left">
             <canvas id="canv" width="360" height="600"></canvas>
         </div>
-        <div id="dbg">
-        </div>
-
     </div>
-
     <footer>
         Game: <span id="gs"></span>
     </footer>

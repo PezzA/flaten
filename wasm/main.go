@@ -18,6 +18,9 @@ func init() {
 	canvas := doc.Call("getElementById", "canv")
 	ctx := canvas.Call("getContext", "2d")
 
+	canvas.Set("width", displayWidth)
+	canvas.Set("height", displayHeight)
+
 	page = jsDoc{
 		doc:    doc,
 		canvas: canvas,
@@ -26,7 +29,6 @@ func init() {
 
 	initEvents()
 	initAssets()
-	initGame()
 }
 
 func main() {
