@@ -6,6 +6,7 @@ type Point struct {
 	Y int
 }
 
+// ClickResult returns data that describes the outcome of the click
 type ClickResult struct {
 	HadEffect     bool
 	BlocksCleared int
