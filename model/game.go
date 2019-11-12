@@ -5,13 +5,17 @@ import (
 	"time"
 )
 
-var startingTick = 200
+var startingTick = 500
 
+// GameState returns an int that represents the game's current state
 type GameState int
 
 const (
+	// New means the game is setup, but has not been started
 	New GameState = iota
+	// Running indicates that the game is currently running
 	Running
+	// GameOver indcates that the game is finished
 	GameOver
 )
 
@@ -38,12 +42,9 @@ func NewGame(width int, height int) Game {
 	return g
 }
 
-func (g *Game) fillGrid() {
-	for x := 0; x < g.Width; x++ {
-		for y := 0; y < g.Height; y++ {
-			g.blocks[y][x] = newBlock()
-		}
-	}
+// GetIncomingRow returns the list of incoming blocks
+func (g *Game) GetIncomingRow() []Block {
+	return g.newRow
 }
 
 // GetBlock returns a specified block from the grid
@@ -86,6 +87,41 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 	g.shiftRight()
 
 	return ClickResult{true, len(blockGroup), scoreDelta}
+}
+
+// Update modifies the game model based on the delta
+func (g *Game) Update(now float64) {
+	if g.State == GameOver {
+		return
+	}
+
+	delta := int(now - g.Timer)
+	g.Timer = now
+
+	g.CurrentTick += delta
+
+	if g.CurrentTick > g.Tick {
+		//g.Tick = g.BlocksCleared / 10
+
+		g.newRow = append(g.newRow, newBlock())
+
+		if len(g.newRow) == g.Width {
+			//add it to the play field
+			g.shuntGrid()
+			g.newRow = []Block{newBlock()}
+		}
+		g.CurrentTick = 0
+	}
+
+	return
+}
+
+func (g *Game) fillGrid() {
+	for x := 0; x < g.Width; x++ {
+		for y := 0; y < g.Height; y++ {
+			g.blocks[y][x] = newBlock()
+		}
+	}
 }
 
 func (g *Game) noMatchGameOver() bool {
@@ -204,33 +240,6 @@ func (g *Game) getBlockGroup(bt BlockType, points []Point) []Point {
 	}
 
 	return points
-}
-
-// Update modifies the game model based on the delta
-func (g *Game) Update(now float64) {
-	if g.State == GameOver {
-		return
-	}
-
-	delta := int(now - g.Timer)
-	g.Timer = now
-
-	g.CurrentTick += delta
-
-	if g.CurrentTick > g.Tick {
-		//g.Tick = g.BlocksCleared / 10
-
-		g.newRow = append(g.newRow, newBlock())
-
-		if len(g.newRow) == g.Width {
-			//add it to the play field
-			g.shuntGrid()
-			g.newRow = []Block{newBlock()}
-		}
-		g.CurrentTick = 0
-	}
-
-	return
 }
 
 func (g *Game) shuntGrid() bool {

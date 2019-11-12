@@ -42,15 +42,22 @@ func (d *JsDoc) ClearFrame(x, y, w, h int) {
 }
 
 // DrawText draws text to the canvas
-func (d *JsDoc) DrawText(text, font, fillStyle, textAlign string, x, y int) {
+func (d *JsDoc) DrawText(text, font, fillStyle, textAlign, textBaseLine string, x, y int) {
 	d.TwoDCtx.Set("font", font)
 	d.TwoDCtx.Set("fillStyle", fillStyle)
 	d.TwoDCtx.Set("textAlign", textAlign)
+	d.TwoDCtx.Set("textBaseline ", textBaseLine)
 	d.TwoDCtx.Call("fillText", text, x, y)
 }
 
-// DrawRect draws a rectangle to the canvas
+// DrawRect draws a filled rectangle to the canvas
 func (d *JsDoc) DrawRect(x, y, w, h int, fillStyle string) {
 	d.TwoDCtx.Set("fillStyle", fillStyle)
 	d.TwoDCtx.Call("fillRect", x, y, w, h)
+}
+
+// StrokeRect draws an unfilled rectangle to the canvas
+func (d *JsDoc) StrokeRect(x, y, w, h int, strokeStyle string) {
+	d.TwoDCtx.Set("strokeStyle", strokeStyle)
+	d.TwoDCtx.Call("strokeRect", x, y, w, h)
 }
