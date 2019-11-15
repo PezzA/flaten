@@ -19,6 +19,7 @@ type Results struct {
 	OverallScore int
 	TenPlus      int
 	TwentyPlus   int
+	Rows         int
 }
 
 // Game holds all the game state

@@ -41,7 +41,7 @@ var tileDist []int = []int{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 1, 1, 2, 2, 3, 3}
+	0, 0, 0, 0, 1, 1, 2, 2, 0, 3}
 
 func newBlock() Block {
 	return Block{
@@ -50,7 +50,7 @@ func newBlock() Block {
 }
 
 func getRandomPlayTile() int {
-	class := rand.Intn(len(tileDist) - 1)
+	class := rand.Intn(len(tileDist))
 
 	if tileDist[class] == 0 {
 		return rand.Intn(playTileMax-playTileMin+1) + playTileMin

@@ -31,7 +31,7 @@ func NewGame(width int, height int) Game {
 		Tick:        startingTick,
 		CurrentTick: 0,
 		newRow:      make([]Block, width),
-		scores:      Results{make(map[BlockType]int), 0, 0, 0},
+		scores:      Results{make(map[BlockType]int), 0, 0, 0, 0},
 	}
 
 	for index := range g.blocks {
@@ -80,6 +80,8 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 	// perform the block action
 	if clickedType == Empty {
 		return ClickResult{false, 0, 0}
+	} else if clickedType == Bomb {
+		blockGroup = g.clearBomb(Point{x, y})
 	} else if clickedType == RedClear {
 		blockGroup = g.clearType(Red, Point{x, y})
 	} else if clickedType == GreenClear {
@@ -154,6 +156,8 @@ func (g *Game) addIncomingBlock() bool {
 func (g *Game) insertIncomingRow() {
 	g.shuntGrid()
 	g.newRow = make([]Block, g.Width)
+	g.scores.Rows++
+	g.Tick = startingTick - (g.scores.Rows * 5)
 }
 
 func (g *Game) fillGrid() {
@@ -187,6 +191,33 @@ func (g *Game) isColEmpty(x int) bool {
 		}
 	}
 	return true
+}
+
+func isPointInBound(x, y, minX, minY, maxX, maxY int) bool {
+	return x >= minX && y >= minY && x < maxX && y < maxY
+}
+
+func (g *Game) clearBomb(p Point) []Point {
+	points := []Point{p}
+
+	testPoints := []Point{
+		Point{p.X - 1, p.Y - 1},
+		Point{p.X, p.Y - 1},
+		Point{p.X + 1, p.Y - 1},
+		Point{p.X + 1, p.Y},
+		Point{p.X + 1, p.Y + 1},
+		Point{p.X, p.Y + 1},
+		Point{p.X - 1, p.Y + 1},
+		Point{p.X - 1, p.Y},
+	}
+
+	for _, tp := range testPoints {
+		if isPointInBound(tp.X, tp.Y, 0, 0, g.Width, g.Height) {
+			points = append(points, tp)
+		}
+	}
+
+	return points
 }
 
 func (g *Game) clearType(t BlockType, p Point) []Point {
