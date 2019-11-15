@@ -6,19 +6,25 @@
 
     <style>
         body {
-            background-image: url('assets/gfx/background/back1.png');
-            background-size: cover;
-            background-repeat: repeat-x;
+            background-image: url('assets/gfx/background/back1.jpg');
+            background-repeat: repeat;
         }
     </style>
 </head>
 
 <body>
     <div style="display: none;">
-        <img id="redsprite" src="assets/gems/items_redgem.png" />
-        <img id="greensprite" src="assets/gems/items_greengem.png" />
-        <img id="bluesprite" src="assets/gems/items_bluegem.png" />
-        <img id="purplesprite" src="assets/gems/items_heart.png" />
+        <img id="redsprite" src="assets/gems/red.png" />
+        <img id="greensprite" src="assets/gems/green.png" />
+        <img id="bluesprite" src="assets/gems/blue.png" />
+        <img id="purplesprite" src="assets/gems/purple.png" />
+
+        <img id="redclear" src="assets/gems/redclear.png" />
+        <img id="greenclear" src="assets/gems/greenclear.png" />
+        <img id="blueclear" src="assets/gems/blueclear.png" />
+        <img id="purpleclear" src="assets/gems/purpleclear.png" />
+        <img id="bomb" src="assets/gems/bomb.png" />
+
         <audio id="music" loop>
             <source src="assets/music/music.ogg" type="audio/ogg">
             <source src="assets/music/music.mp3" type="audio/mpeg">
@@ -27,7 +33,6 @@
             <source src="assets/sfx/click.wav" type="audio/wav">
         </audio>
     </div>
-
     <div>
         <div>
             <button id="reset">New Game</button>

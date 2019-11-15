@@ -23,16 +23,15 @@ const (
 func NewGame(width int, height int) Game {
 	rand.Seed(time.Now().UnixNano())
 	g := Game{
-		blocks:        make([][]Block, height),
-		Width:         width,
-		Height:        height,
-		State:         New,
-		Timer:         0,
-		Score:         0,
-		Tick:          startingTick,
-		CurrentTick:   0,
-		BlocksCleared: 0,
-		newRow:        make([]Block, 0),
+		blocks:      make([][]Block, height),
+		Width:       width,
+		Height:      height,
+		State:       New,
+		Timer:       0,
+		Tick:        startingTick,
+		CurrentTick: 0,
+		newRow:      make([]Block, width),
+		scores:      Results{make(map[BlockType]int), 0, 0, 0},
 	}
 
 	for index := range g.blocks {
@@ -47,9 +46,25 @@ func (g *Game) GetIncomingRow() []Block {
 	return g.newRow
 }
 
+// GetResults gets the current Results from the game
+func (g *Game) GetResults() Results {
+	return g.scores
+}
+
 // GetBlock returns a specified block from the grid
 func (g *Game) GetBlock(x int, y int) Block {
 	return g.blocks[y][x]
+}
+
+// ClickIncoming handles a click on the incoming row
+func (g *Game) ClickIncoming() {
+	for i := 0; i < g.Width; i++ {
+		if g.newRow[i].Type == Empty {
+			g.newRow[i] = Block{getRandomPlayTile()}
+		}
+	}
+
+	g.insertIncomingRow()
 }
 
 // ClickGrid handle a click on a cell
@@ -58,19 +73,30 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 		return ClickResult{false, 0, 0}
 	}
 
-	if g.blocks[y][x].Type == Empty {
+	clickedType := g.blocks[y][x].Type
+
+	var blockGroup []Point
+
+	// perform the block action
+	if clickedType == Empty {
 		return ClickResult{false, 0, 0}
+	} else if clickedType == RedClear {
+		blockGroup = g.clearType(Red, Point{x, y})
+	} else if clickedType == GreenClear {
+		blockGroup = g.clearType(Green, Point{x, y})
+	} else if clickedType == PurpleClear {
+		blockGroup = g.clearType(Purple, Point{x, y})
+	} else if clickedType == BlueClear {
+		blockGroup = g.clearType(Blue, Point{x, y})
+	} else {
+		blockGroup = g.getBlockGroup(clickedType, []Point{Point{X: x, Y: y}})
+
+		if len(blockGroup) < 3 {
+			return ClickResult{false, 0, 0}
+		}
 	}
 
-	blockGroup := g.getBlockGroup(g.blocks[y][x].Type, []Point{Point{X: x, Y: y}})
-
-	if len(blockGroup) < 3 {
-		return ClickResult{false, 0, 0}
-	}
-
-	scoreDelta := len(blockGroup) * len(blockGroup) * 10
-	g.BlocksCleared += len(blockGroup)
-	g.Score += scoreDelta
+	blocksCleared := len(blockGroup)
 
 	colList := make(map[int]bool, 0)
 	for _, b := range blockGroup {
@@ -86,7 +112,11 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 	g.shiftLeft()
 	g.shiftRight()
 
-	return ClickResult{true, len(blockGroup), scoreDelta}
+	// score based on the blocks cleard
+	g.scores.OverallScore += blocksCleared * blocksCleared * 10
+	g.scores.BlockClears[clickedType] += blocksCleared
+
+	return ClickResult{true, len(blockGroup), 0}
 }
 
 // Update modifies the game model based on the delta
@@ -101,19 +131,29 @@ func (g *Game) Update(now float64) {
 	g.CurrentTick += delta
 
 	if g.CurrentTick > g.Tick {
-		//g.Tick = g.BlocksCleared / 10
-
-		g.newRow = append(g.newRow, newBlock())
-
-		if len(g.newRow) == g.Width {
-			//add it to the play field
-			g.shuntGrid()
-			g.newRow = []Block{newBlock()}
+		if g.addIncomingBlock() {
+			g.insertIncomingRow()
 		}
+
 		g.CurrentTick = 0
 	}
 
 	return
+}
+
+func (g *Game) addIncomingBlock() bool {
+	for i := 0; i < g.Width; i++ {
+		if g.newRow[i].Type == Empty {
+			g.newRow[i] = Block{getRandomPlayTile()}
+			return i+1 == g.Width
+		}
+	}
+	return false
+}
+
+func (g *Game) insertIncomingRow() {
+	g.shuntGrid()
+	g.newRow = make([]Block, g.Width)
 }
 
 func (g *Game) fillGrid() {
@@ -147,6 +187,18 @@ func (g *Game) isColEmpty(x int) bool {
 		}
 	}
 	return true
+}
+
+func (g *Game) clearType(t BlockType, p Point) []Point {
+	points := []Point{p}
+	for x := 0; x < g.Width; x++ {
+		for y := 0; y < g.Height; y++ {
+			if g.blocks[y][x].Type == t {
+				points = append(points, Point{x, y})
+			}
+		}
+	}
+	return points
 }
 
 func (g *Game) shiftLeft() {

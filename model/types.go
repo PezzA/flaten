@@ -13,18 +13,25 @@ type ClickResult struct {
 	ScoreDelta    int
 }
 
+// results hols
+type Results struct {
+	BlockClears  map[BlockType]int
+	OverallScore int
+	TenPlus      int
+	TwentyPlus   int
+}
+
 // Game holds all the game state
 type Game struct {
-	blocks        [][]Block
-	newRow        []Block
-	Width         int
-	Height        int
-	State         GameState
-	Timer         float64
-	Score         int
-	Tick          int
-	CurrentTick   int
-	BlocksCleared int
+	blocks      [][]Block
+	newRow      []Block
+	Width       int
+	Height      int
+	State       GameState
+	Timer       float64
+	Tick        int
+	CurrentTick int
+	scores      Results
 }
 
 // Block is a area on a grid
