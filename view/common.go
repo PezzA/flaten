@@ -61,3 +61,14 @@ func (d *JsDoc) StrokeRect(x, y, w, h int, strokeStyle string) {
 	d.TwoDCtx.Set("strokeStyle", strokeStyle)
 	d.TwoDCtx.Call("strokeRect", x, y, w, h)
 }
+
+// PlaySound plays a sound from the beginning
+func (d *JsDoc) PlaySound(sound js.Value) {
+	sound.Set("currentTime", 0)
+	sound.Call("play")
+}
+
+// SetVolume sets the volume for a sound
+func (d *JsDoc) SetVolume(sound js.Value, vol float64) {
+	sound.Set("volume", vol)
+}

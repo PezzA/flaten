@@ -47,6 +47,22 @@ func newBlock() Block {
 	}
 }
 
+func IsBomb(b BlockType) bool {
+	return b == Bomb
+}
+
+func IsClearTile(b BlockType) bool {
+	return b == RedClear || b == BlueClear || b == GreenClear || b == PurpleClear
+}
+
+func IsBlock(b BlockType) bool {
+	return b == Red || b == Blue || b == Green || b == Purple
+}
+
+func IsSlide(b BlockType) bool {
+	return b == SlideLeft || b == SlideUp
+}
+
 func getRandomPlayTile() int {
 	class := rand.Intn(len(tileDist))
 

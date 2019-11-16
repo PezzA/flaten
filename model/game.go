@@ -151,13 +151,15 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 	g.scores.OverallScore += blocksCleared * blocksCleared * 10
 	g.scores.BlockClears[clickedType] += blocksCleared
 
-	return ClickResult{true, len(blockGroup), 0}
+	return ClickResult{true, blocksCleared, clickedType}
 }
 
 // Update modifies the game model based on the delta
-func (g *Game) Update(now float64) {
+func (g *Game) Update(now float64) []string {
+	events := []string{}
+
 	if g.State == GameOver {
-		return
+		return []string{}
 	}
 
 	delta := int(now - g.Timer)
@@ -168,12 +170,15 @@ func (g *Game) Update(now float64) {
 	if g.CurrentTick > g.Tick {
 		if g.addIncomingBlock() {
 			g.insertIncomingRow()
+			events = append(events, "incoming")
+		} else {
+			events = append(events, "pip")
 		}
 
 		g.CurrentTick = 0
 	}
 
-	return
+	return events
 }
 
 func (g *Game) addIncomingBlock() bool {

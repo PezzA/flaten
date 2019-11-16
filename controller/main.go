@@ -26,6 +26,7 @@ var incomingXOffSet = gridXOffSet
 var incomingYOffSet = gridDisplayHeight + gridSize
 
 var startMenu = true
+var gameOver = false
 
 func isPointInBound(x, y, minX, minY, maxX, maxY int) bool {
 	return x >= minX && y >= minY && x < maxX && y < maxY
@@ -45,16 +46,27 @@ func main() {
 
 func handleClick(x int, y int) {
 
-	if startMenu {
+	if startMenu || gameOver {
 		initGame()
 	} else {
 		if isPointInBound(x, y, gridXOffSet, gridYOffSet, gridXOffSet+gridDisplayWidth, gridYOffSet+gridDisplayHeight) {
 			transX, transY := (x-gridXOffSet)/gridSize, (y-gridYOffSet)/gridSize
-			g.ClickGrid(transX, transY)
+			result := g.ClickGrid(transX, transY)
+
+			if model.IsBomb(result.ClickType) {
+				d.PlaySound(view.SfxBomb)
+			} else if model.IsBlock(result.ClickType) {
+				d.PlaySound(view.SfxClick)
+			} else if model.IsClearTile(result.ClickType) {
+				d.PlaySound(view.SfxClear)
+			}
 		}
 
 		if isPointInBound(x, y, incomingXOffSet, incomingYOffSet, incomingXOffSet+gridDisplayWidth, incomingYOffSet+gridSize) {
-			g.ClickIncoming()
+			if g.ClickIncoming() {
+				d.SetVolume(view.SfxIncoming, 0.4)
+				d.PlaySound(view.SfxIncoming)
+			}
 		}
 	}
 }
@@ -62,8 +74,11 @@ func handleClick(x int, y int) {
 func initGame() {
 	fadeOut = 1
 	startMenu = false
+	gameOver = false
 	g = model.NewGame(gameWidth, gameHeight)
 	g.State = model.Running
+	d.SetVolume(view.SfxMusic, 1)
+	d.PlaySound(view.SfxMusic)
 }
 
 var fadeOut float64 = 1
@@ -87,7 +102,14 @@ func doGameLoop(now float64) {
 	}
 
 	if g.State == model.Running {
-		g.Update(now)
+		events := g.Update(now)
+
+		for i := range events {
+			if events[i] == "incoming" {
+				d.SetVolume(view.SfxIncoming, 0.4)
+				d.PlaySound(view.SfxIncoming)
+			}
+		}
 
 		d.ClearFrame(0, 0, canvasWidth, canvasHeight)
 		drawGameGrid(0.3, 1.0)
@@ -96,11 +118,14 @@ func doGameLoop(now float64) {
 	} else if g.State == model.GameOver {
 		d.ClearFrame(0, 0, canvasWidth, canvasHeight)
 		drawGameGrid(0.3, fadeOut)
+		d.SetVolume(view.SfxMusic, fadeOut)
 		d.SetGlobalAlpha(1)
 		d.DrawText("Game Over", "78px goldbox", "black", "center", "middle", canvasWidth/2, canvasHeight/2)
 		fadeOut -= 0.005
 		if fadeOut < 0.005 {
+
 			fadeOut = 0
+			gameOver = true
 		}
 	}
 }
@@ -127,10 +152,6 @@ func drawIncoming() {
 		}
 	}
 	d.SetGlobalAlpha(1)
-	for i := 0; i < gameWidth; i++ {
-		drawX, drawY := (i*gridSize)+incomingXOffSet, incomingYOffSet
-		d.StrokeRect(drawX, drawY, gridSize, gridSize, "#dddddd")
-	}
 }
 
 func drawGameGrid(backGroundAlpha float64, alpha float64) {
@@ -138,7 +159,7 @@ func drawGameGrid(backGroundAlpha float64, alpha float64) {
 		backGroundAlpha = alpha
 	}
 	d.SetGlobalAlpha(backGroundAlpha)
-	d.DrawRect(gridXOffSet, gridYOffSet, gridDisplayWidth, gridDisplayHeight, "#cccccc")
+	d.DrawRect(gridXOffSet, gridYOffSet, gridDisplayWidth, gridDisplayHeight, "#222222")
 	d.SetGlobalAlpha(alpha)
 
 	for x := 0; x < g.Width; x++ {

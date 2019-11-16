@@ -10,6 +10,8 @@ var Bomb, SlideLeft, SlideUp js.Value
 
 var Sushi js.Value
 
+var SfxMusic, SfxClick, SfxClear, SfxBomb, SfxIncoming, SfxIncomingPip js.Value
+
 func (d *JsDoc) initAssets() {
 	BlueSprite = d.GetElementByID("bluesprite")
 	RedSprite = d.GetElementByID("redsprite")
@@ -25,4 +27,11 @@ func (d *JsDoc) initAssets() {
 	SlideLeft = d.GetElementByID("slideleft")
 	SlideUp = d.GetElementByID("slideup")
 	Sushi = d.GetElementByID("sushi")
+
+	SfxMusic = d.GetElementByID("music")
+	SfxClick = d.GetElementByID("click")
+	SfxClear = d.GetElementByID("clear")
+	SfxBomb = d.GetElementByID("bombsfx")
+	SfxIncoming = d.GetElementByID("incoming")
+	SfxIncomingPip = d.GetElementByID("incomingpip")
 }

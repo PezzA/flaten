@@ -10,10 +10,10 @@ type Point struct {
 type ClickResult struct {
 	HadEffect     bool
 	BlocksCleared int
-	ScoreDelta    int
+	ClickType     BlockType
 }
 
-// results hols
+// Results holds stuff
 type Results struct {
 	BlockClears  map[BlockType]int
 	OverallScore int
