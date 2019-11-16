@@ -67,6 +67,26 @@ func (g *Game) ClickIncoming() {
 	g.insertIncomingRow()
 }
 
+func (g *Game) clearCol(x int) []Point {
+	points := []Point{}
+	for y := 0; y < g.Height; y++ {
+		if g.blocks[y][x].Type != Empty {
+			points = append(points, Point{x, y})
+		}
+	}
+	return points
+}
+
+func (g *Game) clearRow(y int) []Point {
+	points := []Point{}
+	for x := 0; x < g.Width; x++ {
+		if g.blocks[y][x].Type != Empty {
+			points = append(points, Point{x, y})
+		}
+	}
+	return points
+}
+
 // ClickGrid handle a click on a cell
 func (g *Game) ClickGrid(x int, y int) ClickResult {
 	if g.State != Running || x >= g.Width || y >= g.Height || x < 0 || y < 0 {
@@ -90,6 +110,10 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 		blockGroup = g.clearType(Purple, Point{x, y})
 	} else if clickedType == BlueClear {
 		blockGroup = g.clearType(Blue, Point{x, y})
+	} else if clickedType == SlideLeft {
+		blockGroup = g.clearRow(y)
+	} else if clickedType == SlideUp {
+		blockGroup = g.clearCol(x)
 	} else {
 		blockGroup = g.getBlockGroup(clickedType, []Point{Point{X: x, Y: y}})
 

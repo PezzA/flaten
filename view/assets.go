@@ -6,7 +6,9 @@ var BlueSprite, RedSprite, GreenSprite, PurpleSprite js.Value
 
 var ClearBlue, ClearRed, ClearGreen, ClearPurple js.Value
 
-var Bomb js.Value
+var Bomb, SlideLeft, SlideUp js.Value
+
+var Sushi js.Value
 
 func (d *JsDoc) initAssets() {
 	BlueSprite = d.GetElementByID("bluesprite")
@@ -20,4 +22,7 @@ func (d *JsDoc) initAssets() {
 	ClearPurple = d.GetElementByID("purpleclear")
 
 	Bomb = d.GetElementByID("bomb")
+	SlideLeft = d.GetElementByID("slideleft")
+	SlideUp = d.GetElementByID("slideup")
+	Sushi = d.GetElementByID("sushi")
 }

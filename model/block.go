@@ -16,19 +16,17 @@ const (
 	BlueClear   BlockType = 7
 	PurpleClear BlockType = 8
 	Bomb        BlockType = 9
-	LeftSlide   BlockType = 10
-	UpSlide     BlockType = 11
-	RightSlide  BlockType = 12
-	DownSlide   BlockType = 13
+	SlideLeft   BlockType = 10
+	SlideUp     BlockType = 11
 )
 
 const (
-	playTileMin  = 1
-	playTileMax  = 4
-	clearTileMin = 5
-	clearTileMax = 8
-	slideTileMin = 10
-	slideTileMax = 13
+	playTileMin    = 1
+	playTileMax    = 4
+	clearTileMin   = 5
+	clearTileMax   = 8
+	specialTileMin = 9
+	specialTileMax = 11
 )
 
 var tileDist []int = []int{
@@ -41,7 +39,7 @@ var tileDist []int = []int{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 1, 1, 2, 2, 0, 3}
+	0, 0, 0, 0, 0, 0, 0, 1, 1, 2}
 
 func newBlock() Block {
 	return Block{
@@ -56,8 +54,8 @@ func getRandomPlayTile() int {
 		return rand.Intn(playTileMax-playTileMin+1) + playTileMin
 	}
 
-	if tileDist[class] == 3 {
-		return Bomb
+	if tileDist[class] == 2 {
+		return rand.Intn(specialTileMax-specialTileMin+1) + specialTileMin
 	}
 
 	if tileDist[class] == 1 {
@@ -65,12 +63,4 @@ func getRandomPlayTile() int {
 	}
 
 	return rand.Intn(playTileMax-playTileMin+1) + playTileMin
-	//if tileDist[class] == 2 {
-	//	return rand.Intn(sli-clearTileMin+1) + clearTileMin
-	//}
-
-	// 1 in 50 chance for
-	// 1 in 30 chance
-	// 1 in 30 chance for bomb
-
 }

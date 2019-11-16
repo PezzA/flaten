@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"syscall/js"
 
 	"github.com/pezza/flaten/model"
 	"github.com/pezza/flaten/view"
@@ -86,24 +87,8 @@ func drawIncoming() {
 	for index, bl := range g.GetIncomingRow() {
 		drawX, drawY := (index*gridSize)+incomingXOffSet, incomingYOffSet
 
-		if bl.Type == model.Red {
-			d.DrawImage(view.RedSprite, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-		} else if bl.Type == model.Blue {
-			d.DrawImage(view.BlueSprite, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-		} else if bl.Type == model.Green {
-			d.DrawImage(view.GreenSprite, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-		} else if bl.Type == model.Purple {
-			d.DrawImage(view.PurpleSprite, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-		} else if bl.Type == model.RedClear {
-			d.DrawImage(view.ClearRed, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-		} else if bl.Type == model.GreenClear {
-			d.DrawImage(view.ClearGreen, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-		} else if bl.Type == model.BlueClear {
-			d.DrawImage(view.ClearBlue, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-		} else if bl.Type == model.PurpleClear {
-			d.DrawImage(view.ClearPurple, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-		} else if bl.Type == model.Bomb {
-			d.DrawImage(view.Bomb, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
+		if bl.Type != model.Empty {
+			d.DrawImage(getSprite(bl.Type), 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
 		}
 	}
 	d.SetGlobalAlpha(1)
@@ -124,25 +109,38 @@ func drawGameGrid(backGroundAlpha float64, alpha float64) {
 
 			drawX, drawY := (x*gridSize)+gridXOffSet, y*gridSize+gridYOffSet
 
-			if bl.Type == model.Red {
-				d.DrawImage(view.RedSprite, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-			} else if bl.Type == model.Blue {
-				d.DrawImage(view.BlueSprite, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-			} else if bl.Type == model.Green {
-				d.DrawImage(view.GreenSprite, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-			} else if bl.Type == model.Purple {
-				d.DrawImage(view.PurpleSprite, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-			} else if bl.Type == model.RedClear {
-				d.DrawImage(view.ClearRed, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-			} else if bl.Type == model.GreenClear {
-				d.DrawImage(view.ClearGreen, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-			} else if bl.Type == model.BlueClear {
-				d.DrawImage(view.ClearBlue, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-			} else if bl.Type == model.PurpleClear {
-				d.DrawImage(view.ClearPurple, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
-			} else if bl.Type == model.Bomb {
-				d.DrawImage(view.Bomb, 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
+			if bl.Type != model.Empty {
+				d.DrawImage(getSprite(bl.Type), 0, 0, gridSize, gridSize, drawX, drawY, gridSize, gridSize)
 			}
 		}
 	}
+}
+
+func getSprite(t model.BlockType) js.Value {
+	switch t {
+	case model.Red:
+		return view.RedSprite
+	case model.Blue:
+		return view.BlueSprite
+	case model.Green:
+		return view.GreenSprite
+	case model.Purple:
+		return view.PurpleSprite
+	case model.Bomb:
+		return view.Bomb
+	case model.RedClear:
+		return view.ClearRed
+	case model.BlueClear:
+		return view.ClearBlue
+	case model.GreenClear:
+		return view.ClearGreen
+	case model.PurpleClear:
+		return view.ClearPurple
+	case model.SlideLeft:
+		return view.SlideLeft
+	case model.SlideUp:
+		return view.SlideUp
+	}
+
+	return view.Sushi
 }
