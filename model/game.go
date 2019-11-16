@@ -57,7 +57,14 @@ func (g *Game) GetBlock(x int, y int) Block {
 }
 
 // ClickIncoming handles a click on the incoming row
-func (g *Game) ClickIncoming() {
+func (g *Game) ClickIncoming() bool {
+	// first check to see if there is a tile on the top row, if so, dont click
+	for x := 0; x < g.Width; x++ {
+		if g.blocks[0][x].Type != Empty {
+			return false
+		}
+	}
+
 	for i := 0; i < g.Width; i++ {
 		if g.newRow[i].Type == Empty {
 			g.newRow[i] = Block{getRandomPlayTile()}
@@ -65,6 +72,8 @@ func (g *Game) ClickIncoming() {
 	}
 
 	g.insertIncomingRow()
+
+	return true
 }
 
 func (g *Game) clearCol(x int) []Point {
@@ -103,13 +112,13 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 	} else if clickedType == Bomb {
 		blockGroup = g.clearBomb(Point{x, y})
 	} else if clickedType == RedClear {
-		blockGroup = g.clearType(Red, Point{x, y})
+		blockGroup = g.clearType([]BlockType{Red, RedClear}, Point{x, y})
 	} else if clickedType == GreenClear {
-		blockGroup = g.clearType(Green, Point{x, y})
+		blockGroup = g.clearType([]BlockType{Green, GreenClear}, Point{x, y})
 	} else if clickedType == PurpleClear {
-		blockGroup = g.clearType(Purple, Point{x, y})
+		blockGroup = g.clearType([]BlockType{Purple, PurpleClear}, Point{x, y})
 	} else if clickedType == BlueClear {
-		blockGroup = g.clearType(Blue, Point{x, y})
+		blockGroup = g.clearType([]BlockType{Blue, BlueClear}, Point{x, y})
 	} else if clickedType == SlideLeft {
 		blockGroup = g.clearRow(y)
 	} else if clickedType == SlideUp {
@@ -244,12 +253,14 @@ func (g *Game) clearBomb(p Point) []Point {
 	return points
 }
 
-func (g *Game) clearType(t BlockType, p Point) []Point {
+func (g *Game) clearType(types []BlockType, p Point) []Point {
 	points := []Point{p}
 	for x := 0; x < g.Width; x++ {
 		for y := 0; y < g.Height; y++ {
-			if g.blocks[y][x].Type == t {
-				points = append(points, Point{x, y})
+			for _, t := range types {
+				if g.blocks[y][x].Type == t {
+					points = append(points, Point{x, y})
+				}
 			}
 		}
 	}

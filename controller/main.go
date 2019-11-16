@@ -25,8 +25,14 @@ var gridYOffSet = gridSize / 2
 var incomingXOffSet = gridXOffSet
 var incomingYOffSet = gridDisplayHeight + gridSize
 
+var startMenu = true
+
+func isPointInBound(x, y, minX, minY, maxX, maxY int) bool {
+	return x >= minX && y >= minY && x < maxX && y < maxY
+}
+
 func init() {
-	d = view.NewJsDoc(handleClick, initGame, doGameLoop)
+	d = view.NewJsDoc(handleClick, doGameLoop)
 	d.SetCanvasSize(canvasWidth, canvasHeight)
 	d.StartAnimLoop()
 }
@@ -38,23 +44,48 @@ func main() {
 }
 
 func handleClick(x int, y int) {
-	// check to see if the click is in the confines of the grid
-	if x >= gridXOffSet && y >= gridYOffSet && x < gridXOffSet+gridDisplayWidth && y < gridYOffSet+gridDisplayHeight {
-		transX, transY := (x-gridXOffSet)/gridSize, (y-gridYOffSet)/gridSize
-		g.ClickGrid(transX, transY)
-	}
 
-	if x >= incomingXOffSet && y >= incomingYOffSet && x < incomingXOffSet+gridDisplayWidth && y < incomingYOffSet+gridSize {
-		g.ClickIncoming()
+	if startMenu {
+		initGame()
+	} else {
+		if isPointInBound(x, y, gridXOffSet, gridYOffSet, gridXOffSet+gridDisplayWidth, gridYOffSet+gridDisplayHeight) {
+			transX, transY := (x-gridXOffSet)/gridSize, (y-gridYOffSet)/gridSize
+			g.ClickGrid(transX, transY)
+		}
+
+		if isPointInBound(x, y, incomingXOffSet, incomingYOffSet, incomingXOffSet+gridDisplayWidth, incomingYOffSet+gridSize) {
+			g.ClickIncoming()
+		}
 	}
 }
 
 func initGame() {
+	fadeOut = 1
+	startMenu = false
 	g = model.NewGame(gameWidth, gameHeight)
 	g.State = model.Running
 }
 
+var fadeOut float64 = 1
+
+func drawStartMenu() {
+	x, y := canvasWidth/2, canvasHeight/2
+
+	d.DrawText("Gem POP!", "78px goldbox", "#333333", "center", "middle", x+3, y+3)
+	d.DrawText("Gem POP!", "78px goldbox", "yellow", "center", "middle", x, y)
+
+	d.DrawText("Click anywhere to start...", "39px goldbox", "#333333", "center", "middle", x+1, y+100+1)
+	d.DrawText("Click anywhere to start...", "39px goldbox", "white", "center", "middle", x, y+100)
+}
+
 func doGameLoop(now float64) {
+
+	if startMenu {
+		d.ClearFrame(0, 0, canvasWidth, canvasHeight)
+		drawStartMenu()
+		return
+	}
+
 	if g.State == model.Running {
 		g.Update(now)
 
@@ -64,22 +95,26 @@ func doGameLoop(now float64) {
 		drawProgressPanel(g.GetResults())
 	} else if g.State == model.GameOver {
 		d.ClearFrame(0, 0, canvasWidth, canvasHeight)
-		drawGameGrid(0.2, 0.5)
+		drawGameGrid(0.3, fadeOut)
 		d.SetGlobalAlpha(1)
-		d.DrawText("Game Over", "45px Comic Sans MS", "black", "center", "middle", canvasWidth/2, canvasHeight/2)
+		d.DrawText("Game Over", "78px goldbox", "black", "center", "middle", canvasWidth/2, canvasHeight/2)
+		fadeOut -= 0.005
+		if fadeOut < 0.005 {
+			fadeOut = 0
+		}
 	}
 }
 
 func drawProgressPanel(res model.Results) {
 	xOffSet, yOffset := gridXOffSet+gridDisplayWidth+(gridSize/2), (gridSize / 2)
 	d.DrawImage(view.RedSprite, 0, 0, gridSize, gridSize, xOffSet, yOffset+(1*gridSize), gridSize, gridSize)
-	d.DrawText(fmt.Sprintf("x %v", res.BlockClears[model.Red]), "24px Consolas", "white", "left", "top", xOffSet+gridSize+10, yOffset+(1*gridSize)+24)
+	d.DrawText(fmt.Sprintf("x %v", res.BlockClears[model.Red]), "26px goldbox", "white", "left", "top", xOffSet+gridSize+10, yOffset+(1*gridSize)+24)
 	d.DrawImage(view.BlueSprite, 0, 0, gridSize, gridSize, xOffSet, yOffset+(2*gridSize), gridSize, gridSize)
-	d.DrawText(fmt.Sprintf("x %v", res.BlockClears[model.Blue]), "24px Consolas", "white", "left", "top", xOffSet+gridSize+10, yOffset+(2*gridSize)+24)
+	d.DrawText(fmt.Sprintf("x %v", res.BlockClears[model.Blue]), "26px goldbox", "white", "left", "top", xOffSet+gridSize+10, yOffset+(2*gridSize)+24)
 	d.DrawImage(view.GreenSprite, 0, 0, gridSize, gridSize, xOffSet, yOffset+(3*gridSize), gridSize, gridSize)
-	d.DrawText(fmt.Sprintf("x %v", res.BlockClears[model.Green]), "24px Consolas", "white", "left", "top", xOffSet+gridSize+10, yOffset+(3*gridSize)+24)
+	d.DrawText(fmt.Sprintf("x %v", res.BlockClears[model.Green]), "26px goldbox", "white", "left", "top", xOffSet+gridSize+10, yOffset+(3*gridSize)+24)
 	d.DrawImage(view.PurpleSprite, 0, 0, gridSize, gridSize, xOffSet, yOffset+(4*gridSize), gridSize, gridSize)
-	d.DrawText(fmt.Sprintf("x %v", res.BlockClears[model.Purple]), "24px Consolas", "white", "left", "top", xOffSet+gridSize+10, yOffset+(4*gridSize)+24)
+	d.DrawText(fmt.Sprintf("x %v", res.BlockClears[model.Purple]), "26px goldbox", "white", "left", "top", xOffSet+gridSize+10, yOffset+(4*gridSize)+24)
 }
 
 func drawIncoming() {
@@ -99,8 +134,11 @@ func drawIncoming() {
 }
 
 func drawGameGrid(backGroundAlpha float64, alpha float64) {
+	if alpha < backGroundAlpha {
+		backGroundAlpha = alpha
+	}
 	d.SetGlobalAlpha(backGroundAlpha)
-	d.DrawRect(gridXOffSet, gridYOffSet, gridDisplayWidth, gridDisplayHeight, "#666666")
+	d.DrawRect(gridXOffSet, gridYOffSet, gridDisplayWidth, gridDisplayHeight, "#cccccc")
 	d.SetGlobalAlpha(alpha)
 
 	for x := 0; x < g.Width; x++ {

@@ -8,6 +8,12 @@
         body {
             background-image: url('assets/gfx/background/back1.jpg');
             background-repeat: repeat;
+            font-family: goldbox;
+        }
+
+        @font-face {
+            font-family: "goldbox";
+            src: url("assets/fonts/GoldBox8x16.ttf");
         }
     </style>
 </head>
@@ -35,23 +41,20 @@
         </audio>
     </div>
     <div>
-        <div>
-            <button id="reset">New Game</button>
-            <button id="muteToggle">Mute</button>
-        </div>
-        <div>
-            <canvas id="canv"></canvas>
-        </div>
+        <canvas id="canv"></canvas>
     </div>
 
     <script src="wasm_exec.js"></script>
     <script>
         const go = new Go();
         let mod, inst;
-        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then(async (result) => {
-            mod = result.module;
-            inst = result.instance;
-            await go.run(inst)
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then(async (result) => {
+                mod = result.module;
+                inst = result.instance;
+                await go.run(inst)
+            });
         });
     </script>
 </body>
