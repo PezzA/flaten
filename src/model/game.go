@@ -15,7 +15,7 @@ const (
 	New GameState = iota
 	// Running indicates that the game is currently running
 	Running
-	// GameOver indcates that the game is finished
+	// GameOver indicates that the game is finished
 	GameOver
 )
 
@@ -26,7 +26,7 @@ func NewGame(width int, height int) Game {
 		blocks:      make([][]Block, height),
 		Width:       width,
 		Height:      height,
-		State:       New,
+		State:       Running,
 		Timer:       0,
 		Tick:        startingTick,
 		CurrentTick: 0,
@@ -67,7 +67,7 @@ func (g *Game) ClickIncoming() bool {
 
 	for i := 0; i < g.Width; i++ {
 		if g.newRow[i].Type == Empty {
-			g.newRow[i] = Block{getRandomPlayTile()}
+			g.newRow[i] = Block{BlockType(getRandomPlayTile())}
 		}
 	}
 
@@ -156,7 +156,7 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 
 // Update modifies the game model based on the delta
 func (g *Game) Update(now float64) []string {
-	events := []string{}
+	events := make([]string, 0)
 
 	if g.State == GameOver {
 		return []string{}
@@ -184,7 +184,7 @@ func (g *Game) Update(now float64) []string {
 func (g *Game) addIncomingBlock() bool {
 	for i := 0; i < g.Width; i++ {
 		if g.newRow[i].Type == Empty {
-			g.newRow[i] = Block{getRandomPlayTile()}
+			g.newRow[i] = Block{BlockType(getRandomPlayTile())}
 			return i+1 == g.Width
 		}
 	}

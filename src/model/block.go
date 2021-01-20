@@ -2,8 +2,7 @@ package model
 
 import "math/rand"
 
-// BlockType holds the type of the block
-type BlockType = int
+type BlockType int
 
 const (
 	Empty       BlockType = 0
@@ -43,7 +42,7 @@ var tileDist []int = []int{
 
 func newBlock() Block {
 	return Block{
-		Type: getRandomPlayTile(),
+		Type: BlockType(getRandomPlayTile()),
 	}
 }
 

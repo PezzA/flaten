@@ -20,20 +20,7 @@
 
 <body>
     <div style="display: none;">
-        <img id="redsprite" src="assets/gfx/gems/red.png" />
-        <img id="greensprite" src="assets/gfx/gems/green.png" />
-        <img id="bluesprite" src="assets/gfx/gems/blue.png" />
-        <img id="purplesprite" src="assets/gfx/gems/purple.png" />
-        <img id="redclear" src="assets/gfx/gems/redclear.png" />
-        <img id="greenclear" src="assets/gfx/gems/greenclear.png" />
-        <img id="blueclear" src="assets/gfx/gems/blueclear.png" />
-        <img id="purpleclear" src="assets/gfx/gems/purpleclear.png" />
-        <img id="bomb" src="assets/gfx/gems/bomb.png" />
-        <img id="slideleft" src="assets/gfx/gems/slideleft.png" />
-        <img id="slideup" src="assets/gfx/gems/slideup.png" />
-        <img id="sushi" src="assets/gfx/gems/sushi.png" />
         <audio id="music" loop>
-            <source src="assets/music/music.ogg" type="audio/ogg">
             <source src="assets/music/music.mp3" type="audio/mpeg">
         </audio>
         <audio id="click">
@@ -52,10 +39,6 @@
             <source src="assets/sfx/bomb.wav" type="audio/wav">
         </audio>
     </div>
-    <div>
-        <canvas id="canv"></canvas>
-    </div>
-
     <script src="wasm_exec.js"></script>
     <script>
         const go = new Go();
