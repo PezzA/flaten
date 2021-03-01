@@ -28,7 +28,7 @@ const (
 	specialTileMax = 11
 )
 
-var tileDist []int = []int{
+var tileDist = []int{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

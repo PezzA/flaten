@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/pezza/advent-of-wasm/wasm"
 	"github.com/pezza/flaten/src/Generated"
 	"github.com/pezza/flaten/src/model"
+	"github.com/pezza/wasm"
 )
 
 // window holds the host runtime environment (wasm JS wrappers in this case) and all the assets used.
@@ -23,6 +23,10 @@ type region struct {
 
 // windowSettings contains precalculated layout values
 type windowSettings struct {
+	offSetX int
+
+	offSetY int
+
 	// cellSize holds the pixel width of each cell
 	cellSize int
 
@@ -55,16 +59,18 @@ func (win window) playSound(asset assetKey, vol float64) {
 // draw takes the current state and renders to the window
 func (win window) draw(s *state) {
 	win.Clear()
-	outlineCanvas(win, s)
+	win.drawBackGround(s)
+	outlineCanvas(win)
 	if !s.running {
-		drawStartMenu(win, s)
+		drawStartMenu(win)
 		return
 	}
 	switch s.game.State {
 	case model.Running:
 		drawGameGrid(win, s)
 		drawIncoming(win, s)
-		drawProgressPanel(win, s)
+		//drawProgressPanel(win, s)
+		win.drawHits(s)
 	case model.GameOver:
 		drawGameGrid(win, s)
 		drawGameOver(win, s)
@@ -73,29 +79,45 @@ func (win window) draw(s *state) {
 
 }
 
-func (ws windowSettings) isClick(pos model.Point, reg regionKey) bool {
-	return pos.X >= ws.regions[reg].tl.X &&
-		pos.Y >= ws.regions[reg].tl.Y &&
-		pos.X < ws.regions[reg].br.X &&
-		pos.Y < ws.regions[reg].br.Y
+func (win window) isInRegion(pos model.Point, reg regionKey) bool {
+	r := win.getRegion(reg)
+	return pos.X >= r.tl.X &&
+		pos.Y >= r.tl.Y &&
+		pos.X <= r.br.X &&
+		pos.Y <= r.br.Y
+}
+
+func (win window) getRegion(rk regionKey) region {
+	reg := win.regions[rk]
+	return reg
 }
 
 func getWindowSettings(cellSizePix int, cellGridWidth int, cellGridHeight int) windowSettings {
+
 	gridDisplayWidth, gridDisplayHeight := cellGridWidth*cellSizePix, cellGridHeight*cellSizePix
 
-	canvasWidth, canvasHeight := gridDisplayWidth*2, gridDisplayHeight+(2*cellSizePix)
+	canvasWidth, canvasHeight := 960, 544
+
+	canvasMidWidth := canvasWidth / 2
+	gridMidWidth := gridDisplayWidth / 2
+
+	canvasMidHeight := canvasHeight / 2
+	gridMidHeight := gridDisplayHeight / 2
+
+	gridTl := model.Point{X: canvasMidWidth - gridMidWidth, Y: canvasMidHeight - (gridMidHeight + cellSizePix + 10)}
+	incomingTl := model.Point{X: gridTl.X, Y: cellSizePix / 2}
 
 	var regions = map[regionKey]region{
 		grid: {
-			tl: model.Point{X: gridDisplayWidth / 2, Y: cellSizePix / 2},
-			br: model.Point{X: (gridDisplayWidth / 2) + gridDisplayWidth, Y: (cellSizePix / 2) + gridDisplayHeight},
+			tl: gridTl,
+			br: model.Point{X: gridTl.X + gridDisplayWidth, Y: gridTl.Y + gridDisplayHeight},
 		},
 		incoming: {
-			tl: model.Point{X: gridDisplayWidth / 2, Y: gridDisplayHeight + cellSizePix},
-			br: model.Point{X: gridDisplayHeight + gridDisplayWidth, Y: (gridDisplayHeight + cellSizePix) + cellSizePix},
+			tl: model.Point{X: incomingTl.X, Y: gridTl.Y + gridDisplayHeight + 10},
+			br: model.Point{X: incomingTl.X + gridDisplayWidth, Y: (gridTl.Y + gridDisplayHeight + 10) + cellSizePix},
 		},
 		progress: {
-			tl: model.Point{X: gridDisplayWidth/2 + gridDisplayWidth, Y: 50},
+			tl: model.Point{X: canvasMidWidth - gridMidWidth + gridDisplayWidth, Y: 50},
 		},
 	}
 	return windowSettings{
@@ -115,6 +137,9 @@ func getWindow(cellSizePix int, cellGridWidth int, cellGridHeight int) window {
 	doc := wasm.NewJsDoc()
 	canvas := doc.GetOrCreateCanvas("gameCanvas", settings.canvasWidth, settings.canvasHeight, true, false)
 
+	settings.offSetX = canvas.OffSetLeft()
+	settings.offSetY = canvas.OffSetTop()
+
 	gfxList := make(assetMap, 0)
 	gfxList[gfxBlueSquare] = doc.GetCanvasImage(Generated.GfxResource_blueSquare.Data, Generated.GfxResource_blueSquare.Width, Generated.GfxResource_blueSquare.Height)
 	gfxList[gfxGreenSquare] = doc.GetCanvasImage(Generated.GfxResource_greenSquare.Data, Generated.GfxResource_greenSquare.Width, Generated.GfxResource_greenSquare.Height)
@@ -127,12 +152,13 @@ func getWindow(cellSizePix int, cellGridWidth int, cellGridHeight int) window {
 	gfxList[gfxSlideLeft] = doc.GetCanvasImage(Generated.GfxResource_slideLeft.Data, Generated.GfxResource_slideLeft.Width, Generated.GfxResource_slideLeft.Height)
 	gfxList[gfxSlideUp] = doc.GetCanvasImage(Generated.GfxResource_slideUp.Data, Generated.GfxResource_slideUp.Width, Generated.GfxResource_slideUp.Height)
 	gfxList[gfxBomb] = doc.GetCanvasImage(Generated.GfxResource_bomb.Data, Generated.GfxResource_bomb.Width, Generated.GfxResource_bomb.Height)
+	gfxList[gfxMeadowSprite] = doc.GetElementByID("superMeadowA")
 
 	sfxList := make(assetMap, 0)
 	sfxList[sfxMusic] = doc.GetElementByID("music")
 	sfxList[sfxClick] = doc.GetElementByID("click")
 	sfxList[sfxClear] = doc.GetElementByID("clear")
-	sfxList[sfxBomb] = doc.GetElementByID("bombsfx")
+	sfxList[sfxBomb] = doc.GetElementByID("bomb")
 	sfxList[sfxIncoming] = doc.GetElementByID("incoming")
 	sfxList[sfxIncomingPip] = doc.GetElementByID("incomingpip")
 

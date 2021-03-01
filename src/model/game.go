@@ -11,10 +11,8 @@ var startingTick = 500
 type GameState int
 
 const (
-	// New means the game is setup, but has not been started
-	New GameState = iota
 	// Running indicates that the game is currently running
-	Running
+	Running GameState = iota
 	// GameOver indicates that the game is finished
 	GameOver
 )
@@ -77,7 +75,7 @@ func (g *Game) ClickIncoming() bool {
 }
 
 func (g *Game) clearCol(x int) []Point {
-	points := []Point{}
+	var points []Point
 	for y := 0; y < g.Height; y++ {
 		if g.blocks[y][x].Type != Empty {
 			points = append(points, Point{x, y})
@@ -87,7 +85,7 @@ func (g *Game) clearCol(x int) []Point {
 }
 
 func (g *Game) clearRow(y int) []Point {
-	points := []Point{}
+	var points []Point
 	for x := 0; x < g.Width; x++ {
 		if g.blocks[y][x].Type != Empty {
 			points = append(points, Point{x, y})
@@ -124,7 +122,7 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 	} else if clickedType == SlideUp {
 		blockGroup = g.clearCol(x)
 	} else {
-		blockGroup = g.getBlockGroup(clickedType, []Point{Point{X: x, Y: y}})
+		blockGroup = g.getBlockGroup(clickedType, []Point{{X: x, Y: y}})
 
 		if len(blockGroup) < 3 {
 			return ClickResult{false, 0, 0}
@@ -147,7 +145,7 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 	g.shiftLeft()
 	g.shiftRight()
 
-	// score based on the blocks cleard
+	// score based on the blocks cleared
 	g.scores.OverallScore += blocksCleared * blocksCleared * 10
 	g.scores.BlockClears[clickedType] += blocksCleared
 
@@ -213,7 +211,7 @@ func (g *Game) noMatchGameOver() bool {
 				continue
 			}
 
-			blockGroup := g.getBlockGroup(g.blocks[y][x].Type, []Point{Point{X: x, Y: y}})
+			blockGroup := g.getBlockGroup(g.blocks[y][x].Type, []Point{{X: x, Y: y}})
 			if len(blockGroup) > 2 {
 				return false
 			}
@@ -239,14 +237,14 @@ func (g *Game) clearBomb(p Point) []Point {
 	points := []Point{p}
 
 	testPoints := []Point{
-		Point{p.X - 1, p.Y - 1},
-		Point{p.X, p.Y - 1},
-		Point{p.X + 1, p.Y - 1},
-		Point{p.X + 1, p.Y},
-		Point{p.X + 1, p.Y + 1},
-		Point{p.X, p.Y + 1},
-		Point{p.X - 1, p.Y + 1},
-		Point{p.X - 1, p.Y},
+		{p.X - 1, p.Y - 1},
+		{p.X, p.Y - 1},
+		{p.X + 1, p.Y - 1},
+		{p.X + 1, p.Y},
+		{p.X + 1, p.Y + 1},
+		{p.X, p.Y + 1},
+		{p.X - 1, p.Y + 1},
+		{p.X - 1, p.Y},
 	}
 
 	for _, tp := range testPoints {
@@ -290,7 +288,7 @@ func (g *Game) shiftLeft() {
 
 func (g *Game) shiftRight() {
 	shunt := 0
-	for i := (g.Width / 2); i <= (g.Width - 1); i++ {
+	for i := g.Width / 2; i <= (g.Width - 1); i++ {
 		if g.isColEmpty(i) {
 			shunt++
 		} else {

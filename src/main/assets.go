@@ -30,4 +30,6 @@ const (
 	gfxBomb         = assetKey(model.Bomb)
 	gfxSlideLeft    = assetKey(model.SlideLeft)
 	gfxSlideUp      = assetKey(model.SlideUp)
+
+	gfxMeadowSprite = 1000
 )

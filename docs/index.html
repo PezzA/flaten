@@ -5,10 +5,22 @@
     <title>WASM Stuff</title>
 
     <style>
+        canvas {
+            padding: 0;
+            margin: auto;
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
         body {
             background-image: url('assets/gfx/background/back1.jpg');
             background-repeat: repeat;
             font-family: goldbox;
+            text-align: center;
         }
 
         @font-face {
@@ -20,6 +32,7 @@
 
 <body>
     <div style="display: none;">
+        <img id="superMeadowA" src="assets/gfx/background/spmtd-a-spritesheet.png"/>
         <audio id="music" loop>
             <source src="assets/music/music.mp3" type="audio/mpeg">
         </audio>
@@ -35,7 +48,7 @@
         <audio id="incomingpip">
             <source src="assets/sfx/incomingpip.wav" type="audio/wav">
         </audio>
-        <audio id="bombsfx">
+        <audio id="bomb">
             <source src="assets/sfx/bomb.wav" type="audio/wav">
         </audio>
     </div>
