@@ -42,7 +42,7 @@ func (win window) drawHits(s *state) {
 
 		text := fmt.Sprintf("+ %d", click.cleared)
 
-		offset := 20 - (click.age / (2000 / 20))
+		offset := 60 - (click.age / (1000 / 60))
 		win.DrawText(text, click.X, click.Y-int(offset), true, font, style, wasm.TextAlignLeft, wasm.TextBaseLineMiddle)
 		win.DrawText(text, click.X, click.Y-int(offset), false, font, "#FFFFFF", wasm.TextAlignLeft, wasm.TextBaseLineMiddle)
 
@@ -175,4 +175,22 @@ func drawGameGrid(win window, s *state) {
 			}
 		}
 	}
+}
+
+func (win window) highlightCells(s *state) {
+	reg := win.getRegion(grid)
+	transX, transY := win.getGridCells(s)
+
+	points := s.game.GetCellGroup(transX, transY)
+
+	if len(points) < 3 {
+		return
+	}
+
+	win.SetFillStyle("#FFFFFF")
+	win.SetGlobalAlpha(0.3)
+	for _, point := range points {
+		win.DrawRectInt( (point.X*win.cellSize)+reg.tl.X,(point.Y*win.cellSize)+reg.tl.Y,win.cellSize,win.cellSize,true)
+	}
+	win.SetGlobalAlpha(1)
 }

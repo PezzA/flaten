@@ -71,6 +71,7 @@ func (win window) draw(s *state) {
 		drawIncoming(win, s)
 		//drawProgressPanel(win, s)
 		win.drawHits(s)
+		win.highlightCells(s)
 	case model.GameOver:
 		drawGameGrid(win, s)
 		drawGameOver(win, s)
@@ -92,6 +93,10 @@ func (win window) getRegion(rk regionKey) region {
 	return reg
 }
 
+func (win window) getGridCells(s *state) (int, int){
+	reg := win.getRegion(grid)
+	return (s.mousePos.X-reg.tl.X)/win.cellSize, (s.mousePos.Y-reg.tl.Y)/win.cellSize
+}
 func getWindowSettings(cellSizePix int, cellGridWidth int, cellGridHeight int) windowSettings {
 
 	gridDisplayWidth, gridDisplayHeight := cellGridWidth*cellSizePix, cellGridHeight*cellSizePix

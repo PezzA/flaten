@@ -112,9 +112,7 @@ func (s *state) handleClick(win window) {
 		s.startNew(win)
 	} else {
 		if win.isInRegion(s.mousePos, grid) {
-			reg := win.getRegion(grid)
-
-			transX, transY := (s.mousePos.X-reg.tl.X)/win.cellSize, (s.mousePos.Y-reg.tl.Y)/win.cellSize
+			transX, transY := win.getGridCells(s)
 
 			result := s.game.ClickGrid(transX, transY)
 

@@ -94,6 +94,39 @@ func (g *Game) clearRow(y int) []Point {
 	return points
 }
 
+func (g *Game) GetCellGroup(x int, y int) []Point {
+	if g.State != Running || x >= g.Width || y >= g.Height || x < 0 || y < 0 {
+		return []Point{}
+	}
+
+	return g.getClearGroup(x,y)
+}
+
+// a clear group is the cells that will be cleared if that cell is clicked.
+func (g *Game) getClearGroup(x int, y int) []Point {
+	clickedType := g.blocks[y][x].Type
+
+	if clickedType == Empty {
+		return []Point{}
+	} else if clickedType == Bomb {
+		return g.clearBomb(Point{x, y})
+	} else if clickedType == RedClear {
+		return g.clearType([]BlockType{Red, RedClear}, Point{x, y})
+	} else if clickedType == GreenClear {
+		return g.clearType([]BlockType{Green, GreenClear}, Point{x, y})
+	} else if clickedType == PurpleClear {
+		return g.clearType([]BlockType{Purple, PurpleClear}, Point{x, y})
+	} else if clickedType == BlueClear {
+		return g.clearType([]BlockType{Blue, BlueClear}, Point{x, y})
+	} else if clickedType == SlideLeft {
+		return g.clearRow(y)
+	} else if clickedType == SlideUp {
+		return g.clearCol(x)
+	} else {
+		return g.getBlockGroup(clickedType, []Point{{X: x, Y: y}})
+	}
+}
+
 // ClickGrid handle a click on a cell
 func (g *Game) ClickGrid(x int, y int) ClickResult {
 	if g.State != Running || x >= g.Width || y >= g.Height || x < 0 || y < 0 {
@@ -102,31 +135,10 @@ func (g *Game) ClickGrid(x int, y int) ClickResult {
 
 	clickedType := g.blocks[y][x].Type
 
-	var blockGroup []Point
+	var blockGroup  = g.getClearGroup(x, y)
 
-	// perform the block action
-	if clickedType == Empty {
+	if len(blockGroup) < 3 {
 		return ClickResult{false, 0, 0}
-	} else if clickedType == Bomb {
-		blockGroup = g.clearBomb(Point{x, y})
-	} else if clickedType == RedClear {
-		blockGroup = g.clearType([]BlockType{Red, RedClear}, Point{x, y})
-	} else if clickedType == GreenClear {
-		blockGroup = g.clearType([]BlockType{Green, GreenClear}, Point{x, y})
-	} else if clickedType == PurpleClear {
-		blockGroup = g.clearType([]BlockType{Purple, PurpleClear}, Point{x, y})
-	} else if clickedType == BlueClear {
-		blockGroup = g.clearType([]BlockType{Blue, BlueClear}, Point{x, y})
-	} else if clickedType == SlideLeft {
-		blockGroup = g.clearRow(y)
-	} else if clickedType == SlideUp {
-		blockGroup = g.clearCol(x)
-	} else {
-		blockGroup = g.getBlockGroup(clickedType, []Point{{X: x, Y: y}})
-
-		if len(blockGroup) < 3 {
-			return ClickResult{false, 0, 0}
-		}
 	}
 
 	blocksCleared := len(blockGroup)
